@@ -59,7 +59,7 @@ export default class Input extends React.Component {
                     onBlur={() => { this.setState({ focus: false }) }}
                     placeholderTextColor={this.state.focus ? '#00a3fc' : 'gray'}
                     secureTextEntry={this.props.password ? true : false}
-                    onChangeText={text => { onChangeText ? this.props.onChangeText(text) : null }}
+                    onChangeText={text => { this.props.onChangeText.onChangeText ? this.props.onChangeText(text) : null }}
                     value={this.props.value ? this.props.value : null}
                     placeholder={this.props.placeholder ? this.props.placeholder : null}
                 />
