@@ -54,12 +54,12 @@ export default class Input extends React.Component {
                 <Icon name={this.props.icon ? this.props.icon : null} size={25} color={this.state.focus ? "#00a3fc" : "gray"} />
                 <TextInput
                     ref={(input) => { this.input = input }}
-                    style={{ marginLeft: 10 }}
+                    style={{ marginLeft: 10 , color:this.state.focus ? '#00a3fc' : 'gray'}}
                     onFocus={() => { this.setState({ focus: true }) }}
                     onBlur={() => { this.setState({ focus: false }) }}
                     placeholderTextColor={this.state.focus ? '#00a3fc' : 'gray'}
                     secureTextEntry={this.props.password ? true : false}
-                    onChangeText={text => { this.props.onChangeText.onChangeText ? this.props.onChangeText(text) : null }}
+                    onChangeText={text => { this.props.onChangeText ? this.props.onChangeText(text) : null }}
                     value={this.props.value ? this.props.value : null}
                     placeholder={this.props.placeholder ? this.props.placeholder : null}
                 />
