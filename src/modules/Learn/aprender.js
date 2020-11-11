@@ -1,13 +1,25 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Storage from '../../model/Storage';
+import Section from '../../components/learn/section'
 
 const Stack = createStackNavigator();
 
 function learn() {
+    Storage.getData().then((data) => {
+
+    })
+    Storage.getToken().then((token) => {
+
+    })
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontWeight: 'bold' , fontSize:20}}>Aprender!</Text>
+        <View style={{ flex: 1, alignItems: 'center' }}>
+            <View style={{ width: Dimensions.get('window').width * 0.975 }}>
+                <Section />
+                <Section />
+                <Section />
+            </View>
         </View>
     );
 }

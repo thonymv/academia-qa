@@ -3,23 +3,37 @@ import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoiding
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import { Input } from '../../components/general'
 import { Button, Text } from 'native-base'
+import Users from '../../model/Users'
+import Storage from '../../model/Storage';
+import { StackActions } from '@react-navigation/native';
+
 export default class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            //email:"user@example.com",
-            email: '',
-            password: '',
+            email: "andrymertinez@gmail.com",
+            password: '12345678'
         }
         this.width = Dimensions.get('window').width
+
+        this.users = new Users()
     }
+
     getHeight(width) {
         let source = resolveAssetSource(require('../../../assets/general/icon_login.png'))
         return (width * source.height) / source.width
     }
 
-    login(){
-        this.props.navigation.navigate('home')
+    login() {
+        this.users.login(this.state.email, this.state.password).then(data => {
+            Storage.storeData({ name: data.name }).then(() => {
+                Storage.storeToken(data.token).then(() => {
+                    this.props.navigation.dispatch(
+                        StackActions.replace('home')
+                    );
+                })
+            })
+        })
     }
 
     render() {
@@ -28,11 +42,11 @@ export default class Login extends React.Component {
                 behavior="position"
                 enabled
                 style={{ flex: 1, alignItems: 'center', backgroundColor: '#efefef' }}
-                keyboardVerticalOffset={-Dimensions.get('window').height*0.2}
+                keyboardVerticalOffset={-Dimensions.get('window').height * 0.2}
             >
                 <View style={{
-                    width:Dimensions.get('window').width*0.7,
-                    height:Dimensions.get('window').height*0.95,
+                    width: Dimensions.get('window').width * 0.7,
+                    height: Dimensions.get('window').height * 0.95,
                     justifyContent: 'center'
                 }}>
                     <Image
@@ -58,7 +72,7 @@ export default class Login extends React.Component {
                         value={this.state.password}
                         onChangeText={password => this.setState({ password })}
                         placeholder={"Contraseña"}
-                        password={(this.state.password.length > 0)}
+                        password={true}
                         icon='lock'
                     />
                     <View style={{
@@ -90,7 +104,7 @@ export default class Login extends React.Component {
                             borderRadius: 25,
                             paddingHorizontal: 20
                         }}
-                        onPress={()=>{
+                        onPress={() => {
                             this.login()
                         }}
                     >
@@ -99,10 +113,10 @@ export default class Login extends React.Component {
                 </View>
                 <View style={{
                     width: Dimensions.get('window').width * 0.7,
-                    height:Dimensions.get('window').height*0.05,
+                    height: Dimensions.get('window').height * 0.05,
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    alignItems:'flex-end'
+                    alignItems: 'flex-end'
                 }}>
                     <View
                         style={{
