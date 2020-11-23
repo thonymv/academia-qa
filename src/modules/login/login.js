@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import { Input } from '../../components/general'
-import { Button, Text } from 'native-base'
+import { Button, Spinner, Text } from 'native-base'
 import Users from '../../model/Users'
 import Storage from '../../model/Storage';
 import { StackActions } from '@react-navigation/native';
@@ -11,12 +11,27 @@ export default class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            email: "andrymertinez@gmail.com",
-            password: '12345678'
+            email: "anthony.mart996@gmail.com",
+            password: '12345678',
+            load:false
         }
         this.width = Dimensions.get('window').width
-
         this.users = new Users()
+        Storage.getToken().then((token)=>{
+            if (token) {
+                this.users.logged().then((response)=>{
+                    if (response == "ok") {
+                        this.props.navigation.dispatch(
+                            StackActions.replace('home')
+                        );
+                    }else{
+                        this.setState({load:true})
+                    }
+                })
+            }else{
+                this.setState({load:true})
+            }
+        })
     }
 
     getHeight(width) {
@@ -37,6 +52,14 @@ export default class Login extends React.Component {
     }
 
     render() {
+        if (!this.state.load) {
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Spinner color='blue' />
+                    <Text style={{ fontSize: Dimensions.get('window').width*0.03}}>Cargando...</Text>
+                </View>
+            );
+        }
         return (
             <KeyboardAvoidingView
                 behavior="position"

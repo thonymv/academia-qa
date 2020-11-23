@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-community/async-storage"
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from 'expo-secure-store'
 
 export default class Storage {
 

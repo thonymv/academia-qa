@@ -1,32 +1,17 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button, Dimensions } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Storage from '../../model/Storage';
-import Section from '../../components/learn/section'
+import { createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
+import Sections from './sections'
+import Section from './section'
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Icon } from 'native-base';
+import Course from './course';
 
 const Stack = createStackNavigator();
 
-function learn() {
-    Storage.getData().then((data) => {
-
-    })
-    Storage.getToken().then((token) => {
-
-    })
-    return (
-        <View style={{ flex: 1, alignItems: 'center' }}>
-            <View style={{ width: Dimensions.get('window').width * 0.975 }}>
-                <Section />
-                <Section />
-                <Section />
-            </View>
-        </View>
-    );
-}
-
 export default function Learn() {
     return (
-        <Stack.Navigator initialRouteName="Aprender" screenOptions={{
+        <Stack.Navigator initialRouteName="sections" screenOptions={{
             headerStyle: {
                 backgroundColor: '#404040',
                 color: 'white'
@@ -37,7 +22,49 @@ export default function Learn() {
             },
             headerLeft: null
         }}>
-            <Stack.Screen name="Aprender" component={learn} />
+            <Stack.Screen
+                name="sections"
+                component={Sections}
+                options={{
+                    title: 'Secciones'
+                }}
+            />
+            <Stack.Screen
+                name="section"
+                component={Section}
+                options={({ route, navigation }) => ({
+                    title: route.params.section.name,
+                    headerLeft: () => (
+                        <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => {
+                            navigation.goBack()
+                        }}>
+                            <Icon name={"arrowleft"} size={16} style={{ color: 'white' }} type={'AntDesign'} />
+                        </TouchableOpacity>
+                    ),
+                    headerTitleStyle: {
+                        fontWeight: 'normal',
+                        fontSize: Dimensions.get('window').width * 0.035
+                    }
+                })}
+            />
+            <Stack.Screen
+                name="course"
+                component={Course}
+                options={({ route, navigation }) => ({
+                    title: route.params.course.name,
+                    headerLeft: () => (
+                        <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => {
+                            navigation.goBack()
+                        }}>
+                            <Icon name={"arrowleft"} size={16} style={{ color: 'white' }} type={'AntDesign'} />
+                        </TouchableOpacity>
+                    ),
+                    headerTitleStyle: {
+                        fontWeight: 'normal',
+                        fontSize: Dimensions.get('window').width * 0.035
+                    }
+                })}
+            />
         </Stack.Navigator>
     );
 }
