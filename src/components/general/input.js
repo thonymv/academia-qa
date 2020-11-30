@@ -44,9 +44,9 @@ export default class Input extends React.Component {
                     {
                         borderRadius: 25,
                         backgroundColor: 'white',
-                        paddingVertical: 10,
                         paddingHorizontal: 15,
-                        flexDirection: 'row'
+                        flexDirection: 'row',
+                        alignItems: 'center'
                     }
                 ]}
                 onPress={()=>{if(this.input){this.input.blur(); this.input.focus()}}}

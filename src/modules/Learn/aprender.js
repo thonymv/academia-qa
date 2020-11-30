@@ -33,7 +33,7 @@ export default function Learn() {
                 name="section"
                 component={Section}
                 options={({ route, navigation }) => ({
-                    title: route.params.section.name,
+                    title: route.params.name,
                     headerLeft: () => (
                         <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => {
                             navigation.goBack()
@@ -51,7 +51,7 @@ export default function Learn() {
                 name="course"
                 component={Course}
                 options={({ route, navigation }) => ({
-                    title: route.params.course.name,
+                    title: route.params.name,
                     headerLeft: () => (
                         <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => {
                             navigation.goBack()

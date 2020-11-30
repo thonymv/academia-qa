@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, TouchableOpacity, Dimensions , FlatList} from 'react-native'
+import { View, TouchableOpacity, Dimensions, FlatList } from 'react-native'
 import { Card, CardItem, Body, Button, Text, Left, Right } from "native-base";
 import ItemCourse from './itemCourse'
 
@@ -10,7 +10,7 @@ export default class SectionComponent extends React.Component {
         this.state = {
 
         }
-        this.fontSize = Dimensions.get('window').width*0.03
+        this.fontSize = Dimensions.get('window').width * 0.03
         this.percentRadius = 8.5
     }
 
@@ -18,7 +18,7 @@ export default class SectionComponent extends React.Component {
         var lessons = 0
         var lessonsPassed = 0
         course.modules.forEach(module => {
-            module.lessons.forEach(lesson=>{
+            module.lessons.forEach(lesson => {
                 ++lessons
                 if (lesson.passed > 0) {
                     ++lessonsPassed
@@ -26,12 +26,13 @@ export default class SectionComponent extends React.Component {
                 console.log(lesson);
             })
         });
-        var percent = 100*lessonsPassed/lessons
-        return (<TouchableOpacity 
+        var percent = 100 * lessonsPassed / lessons
+        return (<TouchableOpacity
             style={{ marginRight: 20 }}
-            onPress={()=>{
+            onPress={() => {
                 this.props.navigation.navigate('course', {
-                    course: course,
+                    name: course.name,
+                    id: course.id
                 });
             }}
         >
@@ -49,11 +50,11 @@ export default class SectionComponent extends React.Component {
         </TouchableOpacity>)
     }
 
-    reduceText = (text , length)=>{
+    reduceText = (text, length) => {
         var result = ""
         for (let i = text.length; i > 0; --i) {
             if (text[i] == " " && i <= length) {
-                result = text.substring(0,i)
+                result = text.substring(0, i)
                 break;
             }
         }
@@ -64,16 +65,14 @@ export default class SectionComponent extends React.Component {
         return (<Card>
             <CardItem >
                 <Body>
-                <Text style={{ fontSize: this.fontSize }}>{this.props.section.name}</Text>
+                    <Text style={{ fontSize: this.fontSize }}>{this.props.section.name}</Text>
                 </Body>
                 <Right>
                     <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={{ paddingHorizontal: 5 }}
-                            onPress={()=>{
-                                this.props.navigation.navigate('section', {
-                                    section: this.props.section,
-                                });
+                            onPress={() => {
+                                this.props.navigation.navigate('section', { id: this.props.section.id,name: this.props.section.name});
                             }}
                         >
                             <Text style={{ color: '#00a3fc', fontSize: this.fontSize - 1 }}>VER MAS</Text>
@@ -82,7 +81,7 @@ export default class SectionComponent extends React.Component {
                 </Right>
             </CardItem>
             <View style={{ marginTop: -5, paddingHorizontal: 17.5 }}>
-                <Text style={{ color: 'gray', fontSize: this.fontSize }}>{this.reduceText(this.props.section.description,60)}...</Text>
+                <Text style={{ color: 'gray', fontSize: this.fontSize }}>{this.reduceText(this.props.section.description, 60)}...</Text>
             </View>
             <CardItem >
                 <Body >
@@ -91,7 +90,7 @@ export default class SectionComponent extends React.Component {
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             data={this.props.section.courses}
-                            renderItem={({item}) => this.item(item)}
+                            renderItem={({ item }) => this.item(item)}
                             keyExtractor={item => item.id}
                         />
                     </View>

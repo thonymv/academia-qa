@@ -49,6 +49,10 @@ export default class Login extends React.Component {
                 })
             })
         })
+        .catch(err =>{
+            console.error(err);
+            alert(err)
+        })
     }
 
     render() {
