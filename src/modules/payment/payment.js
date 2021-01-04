@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
-function payment() {
+function Payment({navigationTab}) {
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontWeight: 'bold' , fontSize:20}}>Suscripción!</Text>
@@ -12,7 +12,7 @@ function payment() {
     );
 }
 
-export default function Payment() {
+export default function PaymentTab({navigation}) {
     return (
         <Stack.Navigator initialRouteName="Suscripción" screenOptions={{
             headerStyle: {
@@ -25,7 +25,7 @@ export default function Payment() {
             },
             headerLeft: null
         }}>
-            <Stack.Screen name="Suscripción" component={payment} />
+            <Stack.Screen name="Suscripción" component={props=>(<Payment {...props} navigationTab={navigation} />)} />
         </Stack.Navigator>
     );
 }

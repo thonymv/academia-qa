@@ -1,8 +1,8 @@
 import React from 'react'
-import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import { Input } from '../../components/general'
-import { Button, Spinner, Text } from 'native-base'
+import { Button, Spinner, Text, Toast, Root } from 'native-base'
 import Users from '../../model/Users'
 import Storage from '../../model/Storage';
 import { StackActions } from '@react-navigation/native';
@@ -11,25 +11,25 @@ export default class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            email: "anthony.mart996@gmail.com",
+            email: "matias@gmail.com",
             password: '12345678',
-            load:false
+            load: false
         }
         this.width = Dimensions.get('window').width
         this.users = new Users()
-        Storage.getToken().then((token)=>{
+        Storage.getToken().then((token) => {
             if (token) {
-                this.users.logged().then((response)=>{
+                this.users.logged().then((response) => {
                     if (response == "ok") {
                         this.props.navigation.dispatch(
                             StackActions.replace('home')
                         );
-                    }else{
-                        this.setState({load:true})
+                    } else {
+                        this.setState({ load: true })
                     }
                 })
-            }else{
-                this.setState({load:true})
+            } else {
+                this.setState({ load: true })
             }
         })
     }
@@ -40,19 +40,52 @@ export default class Login extends React.Component {
     }
 
     login() {
-        this.users.login(this.state.email, this.state.password).then(data => {
-            Storage.storeData({ name: data.name }).then(() => {
-                Storage.storeToken(data.token).then(() => {
-                    this.props.navigation.dispatch(
-                        StackActions.replace('home')
-                    );
-                })
+        if (this.state.load) {
+            this.setState({ load: false })
+            this.users.login(this.state.email, this.state.password).then(data => {
+                if (data.res && data.token && data.name) {
+                    Storage.storeData({ name: data.name }).then(() => {
+                        Storage.storeToken(data.token).then(() => {
+                            Toast.show({
+                                text: "Usuario logueado correctamente",
+                                buttonText: "Ok",
+                                duration: 5000,
+                                type: "success"
+                            })
+                            this.props.navigation.dispatch(
+                                StackActions.replace('home')
+                            );
+                        })
+                            .catch(err => {
+                                this.setState({ load: true })
+                                console.error(err);
+                            })
+                    })
+                        .catch(err => {
+                            this.setState({ load: true })
+                            console.error(err);
+                        })
+                } else {
+                    this.setState({ load: true })
+                    Toast.show({
+                        text: "Usuario o contraseña incorrecta",
+                        buttonText: "Ok",
+                        duration: 5000,
+                        type: "danger"
+                    })
+                }
             })
-        })
-        .catch(err =>{
-            console.error(err);
-            alert(err)
-        })
+                .catch(err => {
+                    this.setState({ load: true })
+                    console.error(err);
+                    Toast.show({
+                        text: "Ha ocurrido un error de comunicación, verifique su conexión a internet o intente mas tarde",
+                        buttonText: "Ok",
+                        duration: 5000,
+                        type: "danger"
+                    })
+                })
+        }
     }
 
     render() {
@@ -60,7 +93,7 @@ export default class Login extends React.Component {
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Spinner color='blue' />
-                    <Text style={{ fontSize: Dimensions.get('window').width*0.03}}>Cargando...</Text>
+                    <Text style={{ fontSize: Dimensions.get('window').width * 0.03 }}>Cargando...</Text>
                 </View>
             );
         }

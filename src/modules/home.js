@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dimensions, Text, View } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'native-base';
 import Profile from './Perfil/perfil'
 import Learn from './Learn/aprender'
@@ -38,8 +38,8 @@ export default function Home() {
                 inactiveTintColor: 'gray',
                 style: {
                     height: Dimensions.get('window').height * 0.08,
-                    paddingBottom: Dimensions.get('window').height * 0.01
-                }
+                    paddingBottom: Dimensions.get('window').height * 0.01,
+                },
             }}
 
         >

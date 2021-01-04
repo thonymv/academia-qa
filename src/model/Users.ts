@@ -47,5 +47,19 @@ export default class Users {
         })
         return response.json()
     }
+
+    async logout(){
+        var token = await Storage.getToken()
+        const response = await fetch(this.url+'logout', {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+token
+            }
+        })
+        return response.json()
+    }
+
 }
     

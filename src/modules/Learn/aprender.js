@@ -9,7 +9,7 @@ import Course from './course';
 
 const Stack = createStackNavigator();
 
-export default function Learn() {
+export default function Learn({navigation}) {
     return (
         <Stack.Navigator initialRouteName="sections" screenOptions={{
             headerStyle: {
@@ -24,7 +24,7 @@ export default function Learn() {
         }}>
             <Stack.Screen
                 name="sections"
-                component={Sections}
+                component={(props)=>(<Sections {...props} navigationTab={navigation} />)}
                 options={{
                     title: 'Secciones'
                 }}

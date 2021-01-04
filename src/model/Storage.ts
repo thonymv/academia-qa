@@ -48,6 +48,16 @@ export default class Storage {
         }
     }
 
+    static async deleteToken() {
+        try {
+            await SecureStore.deleteItemAsync('token')
+            return true;
+        } catch (e) {
+            console.error("error deleteToken: " + e)
+            return false
+        }
+    }
+
     static async storeData(object: {}) {
         try {
             var data = await this.getData()

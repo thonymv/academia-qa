@@ -8,6 +8,7 @@ import Home from './src/modules/home'
 import * as Font from 'expo-font'
 import { Ionicons } from '@expo/vector-icons';
 import OneSignal from 'react-native-onesignal';
+import { Root } from 'native-base';
 
 console.disableYellowBox = true
 YellowBox.ignoreWarnings(['Warning:'])
@@ -71,18 +72,20 @@ export default class App extends React.Component {
 
     if (this.state.loading) {
       return (
-        <View></View>
+        <Root><View></View></Root>
       );
     }
 
     return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" options={{ headerShown: false }} component={Login} />
-          <Stack.Screen name="Register" options={{ headerShown: false }} component={Register} />
-          <Stack.Screen name="home" options={{ headerShown: false }} component={Home} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <Root>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Login">
+            <Stack.Screen name="Login" options={{ headerShown: false }} component={Login} />
+            <Stack.Screen name="Register" options={{ headerShown: false }} component={Register} />
+            <Stack.Screen name="home" options={{ headerShown: false }} component={Home} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Root>
     );
   }
 }

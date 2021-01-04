@@ -7,7 +7,10 @@ export default class Section {
         public description?: string,
         public status?: boolean,
         public courses?: Array<Course>,
-        public updated_at?: Date
-    ) { }
+        public updated_at?: Date,
+        public create_at?: Date
+    ) {
+        
+    }
 
 }
