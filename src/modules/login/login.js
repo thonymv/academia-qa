@@ -1,12 +1,11 @@
 import React from 'react'
 import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
-import { Input } from '../../components/general'
+import { Input , ButtonLogin} from '../../components/general'
 import { Button, Spinner, Text, Toast, Root } from 'native-base'
 import Users from '../../model/Users'
 import Storage from '../../model/Storage';
 import { StackActions } from '@react-navigation/native';
-
 export default class Login extends React.Component {
     constructor(props) {
         super(props)
@@ -170,6 +169,14 @@ export default class Login extends React.Component {
                     >
                         <Text> Entrar </Text>
                     </Button>
+                    <ButtonLogin
+                        onPress={()=>{
+                            
+                        }}
+                        style={{
+                            marginTop:Dimensions.get('window').height*0.05
+                        }}
+                    />
                 </View>
                 <View style={{
                     width: Dimensions.get('window').width * 0.7,

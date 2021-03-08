@@ -1,17 +1,26 @@
 import React from 'react'
-import { View, TouchableOpacity, Dimensions, FlatList } from 'react-native'
-import { Card, CardItem, Body, Button, Text, Left, Right } from "native-base";
+import { View, TouchableOpacity, Dimensions, FlatList, Modal, Alert, TouchableHighlight, Image } from 'react-native'
+import { Card, CardItem, Body, Button, Text, Left, Right, Thumbnail } from "native-base";
 import ItemCourse from './itemCourse'
+import { MIN_PASSED, SERVER } from '../../config/config'
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon2 from 'react-native-vector-icons/FontAwesome';
+import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 
 
 export default class SectionComponent extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-
+            
         }
         this.fontSize = Dimensions.get('window').width * 0.03
         this.percentRadius = 8.5
+    }
+
+    getHeight(width, sourceDir) {
+        let source = resolveAssetSource(sourceDir)
+        return (width * source.height) / source.width
     }
 
     item = (course) => {
@@ -20,7 +29,7 @@ export default class SectionComponent extends React.Component {
         course.modules.forEach(module => {
             module.lessons.forEach(lesson => {
                 ++lessons
-                if (lesson.passed > 0) {
+                if (lesson.percent >= MIN_PASSED) {
                     ++lessonsPassed
                 }
                 console.log(lesson);
@@ -47,6 +56,24 @@ export default class SectionComponent extends React.Component {
                     {course.name}
                 </Text>
             </View>
+            {
+                course.locked ? (
+                    <View style={{
+                        position: 'absolute',
+                        alignItems: 'flex-end',
+                        width: '100%'
+                    }}>
+                        <Icon
+                            name="lock"
+                            size={25}
+                            color="gray"
+                            style={{
+                                opacity: 0.65
+                            }}
+                        />
+                    </View>
+                ) : null
+            }
         </TouchableOpacity>)
     }
 
@@ -62,40 +89,44 @@ export default class SectionComponent extends React.Component {
     }
 
     render() {
-        return (<Card>
-            <CardItem >
-                <Body>
-                    <Text style={{ fontSize: this.fontSize }}>{this.props.section.name}</Text>
-                </Body>
-                <Right>
-                    <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity
-                            style={{ paddingHorizontal: 5 }}
-                            onPress={() => {
-                                this.props.navigation.navigate('section', { id: this.props.section.id,name: this.props.section.name});
-                            }}
-                        >
-                            <Text style={{ color: '#00a3fc', fontSize: this.fontSize - 1 }}>VER MAS</Text>
-                        </TouchableOpacity>
+        return (
+            <View>
+                <Card>
+                    <CardItem >
+                        <Body>
+                            <Text style={{ fontSize: this.fontSize }}>{this.props.section.name}</Text>
+                        </Body>
+                        <Right>
+                            <View style={{ flexDirection: 'row' }}>
+                                <TouchableOpacity
+                                    style={{ paddingHorizontal: 5 }}
+                                    onPress={() => {
+                                        this.props.navigation.navigate('section', { id: this.props.section.id, name: this.props.section.name });
+                                    }}
+                                >
+                                    <Text style={{ color: '#00a3fc', fontSize: this.fontSize - 1 }}>VER MAS</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </Right>
+                    </CardItem>
+                    <View style={{ marginTop: -5, paddingHorizontal: 17.5 }}>
+                        <Text style={{ color: 'gray', fontSize: this.fontSize }}>{this.reduceText(this.props.section.description, 60)}...</Text>
                     </View>
-                </Right>
-            </CardItem>
-            <View style={{ marginTop: -5, paddingHorizontal: 17.5 }}>
-                <Text style={{ color: 'gray', fontSize: this.fontSize }}>{this.reduceText(this.props.section.description, 60)}...</Text>
+                    <CardItem >
+                        <Body >
+                            <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+                                <FlatList
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    data={this.props.section.courses}
+                                    renderItem={({ item }) => this.item(item)}
+                                    keyExtractor={item => item.id}
+                                />
+                            </View>
+                        </Body>
+                    </CardItem>
+                </Card>
             </View>
-            <CardItem >
-                <Body >
-                    <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
-                        <FlatList
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            data={this.props.section.courses}
-                            renderItem={({ item }) => this.item(item)}
-                            keyExtractor={item => item.id}
-                        />
-                    </View>
-                </Body>
-            </CardItem>
-        </Card>)
+        )
     }
 }

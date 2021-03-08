@@ -1,18 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import Profile from './profile'
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
-function profile() {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontWeight: 'bold' , fontSize:20}}>Perfil!</Text>
-        </View>
-    );
-}
-
-export default function Profile() {
+export default function ProfileModule() {
     return (
         <Stack.Navigator initialRouteName="Perfil" screenOptions={{
             headerStyle: {
@@ -25,7 +17,7 @@ export default function Profile() {
             },
             headerLeft: null
         }}>
-            <Stack.Screen name="Perfil" component={profile} />
+            <Stack.Screen name="Perfil" component={Profile} />
         </Stack.Navigator>
     );
 }

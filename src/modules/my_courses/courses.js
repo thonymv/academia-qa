@@ -2,7 +2,7 @@ import React from 'react'
 import { View, TouchableOpacity, Dimensions, FlatList } from 'react-native'
 import { Card, CardItem, Body, Button, Text, Left, Right, Spinner } from "native-base";
 import ItemCourse from '../../components/learn/itemCourse'
-import { Sections } from '../../model/Sections';
+import Users from '../../model/Users';
 import {MIN_PASSED} from '../../config/config'
 
 export default class Section extends React.Component {
@@ -13,9 +13,11 @@ export default class Section extends React.Component {
         }
         this.fontSize = Dimensions.get('window').width*0.03
         this.percentRadius = 8.5
-        var sectionsModel = new Sections()
-        sectionsModel.find(this.props.route.params.id).then(section=>{
-            this.setState({section})
+        var userModel = new Users()
+        userModel.current().then(user=>{
+            this.setState({
+                section:{courses:user.courses}
+            })
         })
     }
 

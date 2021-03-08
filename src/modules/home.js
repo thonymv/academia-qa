@@ -4,7 +4,7 @@ import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom
 import { Icon } from 'native-base';
 import Profile from './Perfil/perfil'
 import Learn from './Learn/aprender'
-import Payment from './payment/payment'
+import MyCourses from './my_courses/my_courses'
 
 const Tab = createBottomTabNavigator();
 
@@ -23,9 +23,9 @@ export default function Home() {
                             iconName = focused ? 'code-braces' : 'code-braces';
                             type = 'MaterialCommunityIcons'
                             break;
-                        case 'Suscripción':
-                            iconName = focused ? 'payment' : 'payment';
-                            type = 'MaterialIcons'
+                        case 'Mis Cursos':
+                            iconName = focused ? 'book' : 'book';
+                            type = 'FontAwesome5'
                             break;
                         default:
                             break;
@@ -41,10 +41,9 @@ export default function Home() {
                     paddingBottom: Dimensions.get('window').height * 0.01,
                 },
             }}
-
         >
             <Tab.Screen name="Aprender" component={Learn} />
-            <Tab.Screen name="Suscripción" component={Payment} />
+            <Tab.Screen name="Mis Cursos" component={MyCourses} />
             <Tab.Screen name="Perfil" component={Profile} />
         </Tab.Navigator>
     );

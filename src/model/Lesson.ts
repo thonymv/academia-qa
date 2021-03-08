@@ -7,7 +7,7 @@ export default class Lesson {
         public content?: string,
         public test?: string,
         public status?: boolean,
-        public passed?: boolean,
+        public percent?: boolean,
         public updated_at?:Date
     ){}
 
