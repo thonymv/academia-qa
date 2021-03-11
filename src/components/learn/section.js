@@ -36,16 +36,16 @@ export default class SectionComponent extends React.Component {
             })
         });
         var percent = 100 * lessonsPassed / lessons
-        return (<TouchableOpacity
+        return (<View
             style={{ marginRight: 20 }}
-            onPress={() => {
-                this.props.navigation.navigate('course', {
-                    name: course.name,
-                    id: course.id
-                });
-            }}
         >
             <ItemCourse
+                onPress={() => {
+                    this.props.navigation.navigate('course', {
+                        name: course.name,
+                        id: course.id
+                    });
+                }}
                 percent={percent}
                 radius={Dimensions.get('window').width * this.percentRadius / 100}
                 borderWidth={3}
@@ -74,7 +74,7 @@ export default class SectionComponent extends React.Component {
                     </View>
                 ) : null
             }
-        </TouchableOpacity>)
+        </View>)
     }
 
     reduceText = (text, length) => {

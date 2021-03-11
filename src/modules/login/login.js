@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
-import { Input , ButtonLogin} from '../../components/general'
+import { Input, ButtonLogin} from '../../components/general'
 import { Button, Spinner, Text, Toast, Root } from 'native-base'
 import Users from '../../model/Users'
 import Storage from '../../model/Storage';

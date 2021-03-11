@@ -23,8 +23,8 @@ export default class ButtonLogin extends React.Component {
                 clientSecret="ofxarIbidMJ8UiIf"
                 redirectUri="https://adprosoft.com/"
                 onSuccess={token => console.log(token)}
-                renderButton={(props_linkedin) => {
-                    console.log(this.linkedRef.current);
+                onError={err => console.error("error en: "+err.message)}
+                renderButton={() => {
                     return (
                         <TouchableOpacity
                             onPress={()=>{this.linkedRef.current.open()}}

@@ -1,9 +1,11 @@
 import React from 'react'
 import { View, TouchableOpacity, Dimensions, FlatList } from 'react-native'
-import { Card, CardItem, Body, Button, Text, Left, Right, Spinner } from "native-base";
+import { Card, CardItem, Body, Button, Text, Left, Right, Spinner , Toast, Icon} from "native-base";
 import ItemCourse from '../../components/learn/itemCourse'
 import Users from '../../model/Users';
+import Storage from '../../model/Storage';
 import {MIN_PASSED} from '../../config/config'
+import { StackActions } from '@react-navigation/native';
 
 export default class Section extends React.Component {
     constructor(props) {
@@ -19,6 +21,44 @@ export default class Section extends React.Component {
                 section:{courses:user.courses}
             })
         })
+        this.usersModel = new Users()
+        this.props.navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity style={{ paddingLeft: 12.5, transform: [{ rotateY: '180deg' }] }} onPress={() => {
+                    if (this.state.section) {
+                        this.setState({ load: false })
+                        this.usersModel.logout().then(data => {
+                            if (data.res) {
+                                console.log("Sesión cerrada correctamente en el servidor");
+                            } else {
+                                console.error("El servidor no pudo completar el cierre de sesión");
+                            }
+                            Storage.deleteToken().then(res => console.log("delete token res: " + res)).catch(err => console.error("delete token error: " + err))
+                            Toast.show({
+                                text: "Se ha cerrado la sesión correctamente",
+                                buttonText: "Ok",
+                                duration: 5000,
+                                type:'success'
+                            })
+                            this.props.navigation.dispatch(
+                                StackActions.replace('Login')
+                            );
+                        }).catch(err => {
+                            Toast.show({
+                                text: "Ha ocurrido un error inesperado al cerrar la sesión",
+                                buttonText: "Ok",
+                                duration: 5000,
+                                type: "danger"
+                            })
+                            this.setState({ load: true })
+                            console.error("error logout: " + err);
+                        })
+                    }
+                }}>
+                    <Icon name={"logout"} size={16} style={{ color: 'white' }} type={'MaterialCommunityIcons'} />
+                </TouchableOpacity>
+            )
+        });
     }
 
     item = (course) => {
@@ -48,6 +88,12 @@ export default class Section extends React.Component {
                     <CardItem >
                         <Left>
                             <ItemCourse
+                                onPress={() => {
+                                    this.props.navigation.navigate('course', {
+                                        name: course.name,
+                                        id: course.id
+                                    });
+                                }}
                                 percent={percent}
                                 radius={Dimensions.get('window').width * this.percentRadius / 100}
                                 borderWidth={3}
