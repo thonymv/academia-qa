@@ -33,9 +33,9 @@ export default class Login extends React.Component {
         })
     }
 
-    getHeight(width) {
+    getWidth(height) {
         let source = resolveAssetSource(require('../../../assets/general/icon_login.png'))
-        return (width * source.height) / source.width
+        return (height * source.width) / source.height
     }
 
     login() {
@@ -110,7 +110,7 @@ export default class Login extends React.Component {
                 }}>
                     <Image
                         source={require('../../../assets/general/icon_login.png')}
-                        style={{ height: this.getHeight(this.width * 0.7), width: this.width * 0.7 }}
+                        style={{ height: Dimensions.get('window').height*0.265 , width:this.getWidth(Dimensions.get('window').height*0.265)}}
                     />
                     <View style={{
                         paddingTop: 20,
