@@ -114,7 +114,7 @@ export default class Login extends React.Component {
                         alignItems: 'center',
                         resizeMode: 'cover'
                     }}
-                    source={require('../../../assets/general/background.png')}
+                    source={require('../../../assets/general/background2.png')}
                 >
                     <View style={{
                         width: Dimensions.get('window').width * 0.7,
