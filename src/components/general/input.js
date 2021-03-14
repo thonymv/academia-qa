@@ -51,10 +51,10 @@ export default class Input extends React.Component {
                 ]}
                 onPress={()=>{if(this.input){this.input.blur(); this.input.focus()}}}
             >
-                <Icon name={this.props.icon ? this.props.icon : null} size={25} color={this.state.focus ? "#00a3fc" : "gray"} />
+                <Icon name={this.props.icon ? this.props.icon : null} size={Dimensions.get('window').height*0.03} color={this.state.focus ? "#00a3fc" : "gray"} />
                 <TextInput
                     ref={(input) => { this.input = input }}
-                    style={{ marginLeft: 10 , color:this.state.focus ? '#00a3fc' : 'gray'}}
+                    style={{ marginLeft: 10,fontSize:Dimensions.get('window').height*0.0175 , color:this.state.focus ? '#00a3fc' : 'gray'}}
                     onFocus={() => { this.setState({ focus: true });if(this.props.changeFocus){this.props.changeFocus(true);}}}
                     onBlur={() => { this.setState({ focus: false });if(this.props.changeFocus){this.props.changeFocus(false);}}}
                     placeholderTextColor={this.state.focus ? '#00a3fc' : 'gray'}

@@ -135,7 +135,7 @@ export default class Login extends React.Component {
                             icon='user'
                         />
                         <Input
-                            style={{ marginTop: 20 }}
+                            style={{ marginTop: Dimensions.get('window').height*0.02 }}
                             value={this.state.password}
                             onChangeText={password => this.setState({ password })}
                             placeholder={"Contraseña"}
@@ -173,7 +173,11 @@ export default class Login extends React.Component {
                                 this.login()
                             }}
                         >
-                            <Text> Entrar </Text>
+                            <Text style={{
+                                fontSize:Dimensions.get('window').height*0.0175
+                            }}> 
+                                Entrar 
+                            </Text>
                         </Button>
                         <ButtonLoginLinkedin
                             onPress={()=>{
