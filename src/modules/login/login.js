@@ -118,7 +118,7 @@ export default class Login extends React.Component {
                 >
                     <View style={{
                         width: Dimensions.get('window').width * 0.7,
-                        height:this.getHeight(Dimensions.get('window').width),
+                        height:Dimensions.get('window').height*0.95,
                         justifyContent: 'center',
                     }}>
                         <Image
