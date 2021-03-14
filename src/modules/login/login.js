@@ -110,13 +110,12 @@ export default class Login extends React.Component {
             >
                 <ImageBackground 
                     style={{
-                        width:Dimensions.get('window').width,
-                        height:this.getHeight(Dimensions.get('window').width),
+                        height:Dimensions.get('window').height*0.95,
                         alignItems: 'center',
                         resizeMode: 'cover'
                     }}
-                    source={require('../../../assets/general/background2.png')}
-                    >
+                    source={require('../../../assets/general/background.png')}
+                >
                     <View style={{
                         width: Dimensions.get('window').width * 0.7,
                         height:this.getHeight(Dimensions.get('window').width),
