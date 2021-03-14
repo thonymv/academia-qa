@@ -161,24 +161,26 @@ export default class Login extends React.Component {
                             </Text>
                             </TouchableOpacity>
                         </View>
-                        <Button
+                        <TouchableOpacity
                             style={{
                                 backgroundColor: "#00a3fc",
                                 alignSelf: 'center',
                                 marginTop: Dimensions.get('window').height*0.02,
                                 borderRadius: 25,
-                                paddingHorizontal: 20
+                                paddingHorizontal: Dimensions.get('window').width*0.1,
+                                paddingVertical:Dimensions.get('window').height*0.015
                             }}
                             onPress={() => {
                                 this.login()
                             }}
                         >
                             <Text style={{
-                                fontSize:Dimensions.get('window').height*0.0175
+                                fontSize:Dimensions.get('window').height*0.02,
+                                color:'white'
                             }}> 
                                 Entrar 
                             </Text>
-                        </Button>
+                        </TouchableOpacity>
                         <ButtonLoginLinkedin
                             onPress={()=>{
                                 
