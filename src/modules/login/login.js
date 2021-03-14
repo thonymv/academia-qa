@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid, ImageBackground } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
-import { Input, ButtonLogin} from '../../components/general'
+import { Input, ButtonLoginLinkedin,ButtonLoginGoogle} from '../../components/general'
 import { Button, Spinner, Text, Toast, Root } from 'native-base'
 import Users from '../../model/Users'
 import Storage from '../../model/Storage';
@@ -175,7 +175,7 @@ export default class Login extends React.Component {
                         >
                             <Text> Entrar </Text>
                         </Button>
-                        <ButtonLogin
+                        <ButtonLoginLinkedin
                             onPress={()=>{
                                 
                             }}
@@ -183,7 +183,7 @@ export default class Login extends React.Component {
                                 marginTop:Dimensions.get('window').height*0.04
                             }}
                         />
-                        <ButtonLogin
+                        <ButtonLoginGoogle
                             onPress={()=>{
                                 
                             }}

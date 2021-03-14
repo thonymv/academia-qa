@@ -1,4 +1,5 @@
 import Input from './general/input'
-import ButtonLogin from './general/button-login'
+import ButtonLoginLinkedin from './general/button-login-linkedin'
+import ButtonLoginGoogle from './general/button-login-google'
 
-export {Input,ButtonLogin}
+export {Input,ButtonLoginLinkedin,ButtonLoginGoogle}
