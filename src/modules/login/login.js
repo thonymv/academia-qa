@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Image, Dimensions, TouchableOpacity, KeyboardAvoidingView, ToastAndroid, ImageBackground } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import { Input, ButtonLogin} from '../../components/general'
 import { Button, Spinner, Text, Toast, Root } from 'native-base'
@@ -36,6 +36,11 @@ export default class Login extends React.Component {
     getWidth(height) {
         let source = resolveAssetSource(require('../../../assets/general/icon_login.png'))
         return (height * source.width) / source.height
+    }
+
+    getHeight(width) {
+        let source = resolveAssetSource(require('../../../assets/general/background2.png'))
+        return (width * source.height) / source.width
     }
 
     login() {
@@ -103,77 +108,95 @@ export default class Login extends React.Component {
                 style={{ flex: 1, alignItems: 'center', backgroundColor: '#efefef' }}
                 keyboardVerticalOffset={-Dimensions.get('window').height * 0.2}
             >
-                <View style={{
-                    width: Dimensions.get('window').width * 0.7,
-                    minHeight:Dimensions.get('window').height*0.85,
-                    justifyContent: 'center'
-                }}>
-                    <Image
-                        source={require('../../../assets/general/icon_login.png')}
-                        style={{ 
-                            height: Dimensions.get('window').height*0.265 , 
-                            width:this.getWidth(Dimensions.get('window').height*0.265)
-                        }}
-                    />
-                    <Input
-                        value={this.state.email}
-                        onChangeText={email => this.setState({ email })}
-                        placeholder={"Correo electrónico"}
-                        icon='user'
-                    />
-                    <Input
-                        style={{ marginTop: 20 }}
-                        value={this.state.password}
-                        onChangeText={password => this.setState({ password })}
-                        placeholder={"Contraseña"}
-                        password={true}
-                        icon='lock'
-                    />
+                <ImageBackground 
+                    style={{
+                        width:Dimensions.get('window').width,
+                        height:this.getHeight(Dimensions.get('window').width),
+                        alignItems: 'center',
+                        resizeMode: 'cover'
+                    }}
+                    source={require('../../../assets/general/background2.png')}
+                    >
                     <View style={{
-                        width: Dimensions.get('window').width * 0.7
+                        width: Dimensions.get('window').width * 0.7,
+                        height:this.getHeight(Dimensions.get('window').width),
+                        justifyContent: 'center',
                     }}>
-                        <TouchableOpacity
-                            style={{
-                                alignSelf: 'flex-end',
-                                paddingVertical: Dimensions.get('window').height*0.0125
+                        <Image
+                            source={require('../../../assets/general/icon_login.png')}
+                            style={{ 
+                                height: Dimensions.get('window').height*0.265 , 
+                                width:this.getWidth(Dimensions.get('window').height*0.265)
                             }}
-                        >
-                            <Text
+                        />
+                        <Input
+                            value={this.state.email}
+                            onChangeText={email => this.setState({ email })}
+                            placeholder={"Correo electrónico"}
+                            icon='user'
+                        />
+                        <Input
+                            style={{ marginTop: 20 }}
+                            value={this.state.password}
+                            onChangeText={password => this.setState({ password })}
+                            placeholder={"Contraseña"}
+                            password={true}
+                            icon='lock'
+                        />
+                        <View style={{
+                            width: Dimensions.get('window').width * 0.7
+                        }}>
+                            <TouchableOpacity
                                 style={{
-                                    color: '#404040',
-                                    fontWeight: 'bold',
-                                    fontSize: Dimensions.get('window').height*0.0125
+                                    alignSelf: 'flex-end',
+                                    paddingVertical: Dimensions.get('window').height*0.0125
                                 }}
                             >
-                                ¿Olvidaste tu contraseña?
-                        </Text>
-                        </TouchableOpacity>
+                                <Text
+                                    style={{
+                                        color: '#404040',
+                                        fontWeight: 'bold',
+                                        fontSize: Dimensions.get('window').height*0.0125
+                                    }}
+                                >
+                                    ¿Olvidaste tu contraseña?
+                            </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Button
+                            style={{
+                                backgroundColor: "#00a3fc",
+                                alignSelf: 'center',
+                                marginTop: Dimensions.get('window').height*0.02,
+                                borderRadius: 25,
+                                paddingHorizontal: 20
+                            }}
+                            onPress={() => {
+                                this.login()
+                            }}
+                        >
+                            <Text> Entrar </Text>
+                        </Button>
+                        <ButtonLogin
+                            onPress={()=>{
+                                
+                            }}
+                            style={{
+                                marginTop:Dimensions.get('window').height*0.04
+                            }}
+                        />
+                        <ButtonLogin
+                            onPress={()=>{
+                                
+                            }}
+                            style={{
+                                marginTop:Dimensions.get('window').height*0.02
+                            }}
+                        />
                     </View>
-                    <Button
-                        style={{
-                            backgroundColor: "#404040",
-                            alignSelf: 'center',
-                            marginTop: Dimensions.get('window').height*0.02,
-                            borderRadius: 25,
-                            paddingHorizontal: 20
-                        }}
-                        onPress={() => {
-                            this.login()
-                        }}
-                    >
-                        <Text> Entrar </Text>
-                    </Button>
-                    <ButtonLogin
-                        onPress={()=>{
-                            
-                        }}
-                        style={{
-                            marginTop:Dimensions.get('window').height*0.05
-                        }}
-                    />
-                </View>
+                </ImageBackground>
                 <View style={{
-                    width: Dimensions.get('window').width * 0.7,
+                    width: Dimensions.get('window').width,
                     flexDirection: 'row',
                     flex:1,
                     justifyContent: 'center',
@@ -188,7 +211,7 @@ export default class Login extends React.Component {
                             style={{
                                 color: '#404040',
                                 fontWeight: 'bold',
-                                fontSize: Dimensions.get('window').height*0.01
+                                fontSize: Dimensions.get('window').height*0.0125
                             }}
                         >
                             ¿Aún no tienes una cuenta?
@@ -204,7 +227,7 @@ export default class Login extends React.Component {
                             style={{
                                 color: '#00a3fc',
                                 fontWeight: 'bold',
-                                fontSize: Dimensions.get('window').height*0.01
+                                fontSize: Dimensions.get('window').height*0.0125
                             }}
                         >
                             Registrate aquí
