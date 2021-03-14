@@ -33,7 +33,7 @@ export default class ButtonLogin extends React.Component {
                                     width: '100%',
                                     borderRadius: 10,
                                     backgroundColor: '#00a3fc',
-                                    padding: 15,
+                                    paddingVertical: Dimensions.get('window').height*0.015,
                                     flexDirection: 'row',
                                     alignItems: 'center',
                                     justifyContent: 'center'
@@ -43,14 +43,14 @@ export default class ButtonLogin extends React.Component {
                         >
                             <Icon
                                 name="linkedin-square"
-                                size={30}
+                                size={Dimensions.get('window').height*0.035}
                                 color="white"
                             />
                             <Text style={{
                                 marginLeft: 5,
                                 color: 'white',
                                 fontWeight: 'bold',
-                                fontSize: 15
+                                fontSize: Dimensions.get('window').height*0.0175
                             }}>
                                 Iniciar sesión con Linkedin
                             </Text>

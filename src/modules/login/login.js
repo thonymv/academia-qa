@@ -148,14 +148,13 @@ export default class Login extends React.Component {
                             <TouchableOpacity
                                 style={{
                                     alignSelf: 'flex-end',
-                                    paddingVertical: Dimensions.get('window').height*0.0125
+                                    paddingVertical: Dimensions.get('window').height*0.01375
                                 }}
                             >
                                 <Text
                                     style={{
-                                        color: '#404040',
-                                        fontWeight: 'bold',
-                                        fontSize: Dimensions.get('window').height*0.0125
+                                        color: 'white',
+                                        fontSize: Dimensions.get('window').height*0.01375
                                     }}
                                 >
                                     ¿Olvidaste tu contraseña?
@@ -203,14 +202,14 @@ export default class Login extends React.Component {
                 }}>
                     <View
                         style={{
-                            paddingVertical: Dimensions.get('window').height*0.01,
+                            paddingVertical: Dimensions.get('window').height*0.015,
                         }}
                     >
                         <Text
                             style={{
                                 color: '#404040',
                                 fontWeight: 'bold',
-                                fontSize: Dimensions.get('window').height*0.0125
+                                fontSize: Dimensions.get('window').height*0.0175
                             }}
                         >
                             ¿Aún no tienes una cuenta?
@@ -218,7 +217,7 @@ export default class Login extends React.Component {
                     </View>
                     <TouchableOpacity
                         style={{
-                            paddingVertical: Dimensions.get('window').height*0.01,
+                            paddingVertical: Dimensions.get('window').height*0.015,
                             marginLeft: 5
                         }}
                     >
@@ -226,7 +225,7 @@ export default class Login extends React.Component {
                             style={{
                                 color: '#00a3fc',
                                 fontWeight: 'bold',
-                                fontSize: Dimensions.get('window').height*0.0125
+                                fontSize: Dimensions.get('window').height*0.0175
                             }}
                         >
                             Registrate aquí
