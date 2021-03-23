@@ -4,8 +4,8 @@ import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import { Input, ButtonLoginLinkedin,ButtonLoginGoogle} from '../../components/general'
 import { Button, Spinner, Text, Toast, Root } from 'native-base'
 import Users from '../../model/Users'
-import Storage from '../../model/Storage';
-import { StackActions } from '@react-navigation/native';
+import Storage from '../../model/Storage'
+import { StackActions } from '@react-navigation/native'
 export default class Login extends React.Component {
     constructor(props) {
         super(props)
