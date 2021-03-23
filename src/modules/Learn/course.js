@@ -8,6 +8,7 @@ import Icon2 from 'react-native-vector-icons/FontAwesome';
 import { MIN_PASSED, SERVER } from '../../config/config'
 import ItemCourse from '../../components/learn/itemCourse'
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
+import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
 
 if (
     Platform.OS === "android" &&
@@ -51,6 +52,11 @@ function ProgressBar({ width, height, percent, colorBar, colorProgress }) {
     </View>)
 }
 
+/////MERCADO PAGO
+const MP_ACCESS_TOKEN = 'TEST-327743174144430-071520-f0276babdf909973e9dadc223501a3b4-408605535'
+const MP_PUBLIC_KEY='TEST-f602cc6b-2238-4839-9e20-f224caf00f20'
+/////////
+
 export default class Course extends React.Component {
     constructor(props) {
         super(props)
@@ -59,7 +65,8 @@ export default class Course extends React.Component {
             activeIndex: null,
             modalBuy: false,
             paymentId: 0,
-            scroll:0
+            scroll:0 ,
+            MppaymentResult:null
         }
         this.payments = [
             require('../../../assets/general/paypal.png'),
@@ -74,6 +81,45 @@ export default class Course extends React.Component {
             this.setState({ course })
         })
         this.premium = false
+    }
+
+    getMercadoPagoPreferenceId = async (payer, ...items) => {
+        const response = await fetch(
+          `https://api.mercadopago.com/checkout/preferences?access_token=${MP_ACCESS_TOKEN}`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              items,
+              payer: {
+                email: payer,
+              },
+            }),
+          }
+        );
+        const preference = await response.json();
+  
+        return preference.id;
+      };
+
+ async PayWithMercadoPago(){
+        try {
+           
+            const preferenceId = await this.getMercadoPagoPreferenceId('payer@email.com', {
+              title: 'Dummy Item Title',
+              description: 'Dummy Item Description',
+              quantity: 1,
+              currency_id: 'ARS',
+              unit_price: 10.0,
+            });
+            const payment = await MercadoPagoCheckout.createPayment({
+              publicKey: MP_PUBLIC_KEY,
+              preferenceId,
+            });
+      
+            this.setState({MppaymentResult:payment})
+          } catch (err) {
+            Alert.alert('Something went wrong', err.message);
+          }
     }
 
     getHeight(width, sourceDir) {
@@ -314,7 +360,8 @@ export default class Course extends React.Component {
                                                         backgroundColor: '#404040'
                                                     }}
                                                     onPress={() => {
-                                                        this.setState({ modalBuy: false })
+                                                       // this.setState({ modalBuy: false })
+                                                        this.PayWithMercadoPago()
                                                     }}
                                                 >
                                                     <Text>Comprar</Text>
