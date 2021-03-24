@@ -3,6 +3,7 @@ import { StatusBar, YellowBox, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from './src/modules/login/login'
+import Test from './src/modules/test/test'
 import Register from './src/modules/register/register'
 import Home from './src/modules/home'
 import * as Font from 'expo-font'
@@ -81,6 +82,7 @@ export default class App extends React.Component {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
             <Stack.Screen name="Login" options={{ headerShown: false }} component={Login} />
+            <Stack.Screen name="Test" options={{ headerShown: false }} component={Test} />
             <Stack.Screen name="Register" options={{ headerShown: false }} component={Register} />
             <Stack.Screen name="home" options={{ headerShown: false }} component={Home} />
           </Stack.Navigator>
