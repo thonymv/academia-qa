@@ -7,7 +7,7 @@ import Storage from '../../model/Storage';
 import {MIN_PASSED} from '../../config/config'
 import { StackActions } from '@react-navigation/native';
 
-export default class Section extends React.Component {
+export default class Courses extends React.Component {
     constructor(props) {
         super(props)
         this.state = {

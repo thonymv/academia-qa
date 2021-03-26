@@ -22,4 +22,16 @@ export default class Courses {
         return await response.json() as Course
     }
 
+    async payment(id,id_pay){
+        var token = await Storage.getToken()
+        const response = await fetch(this.url+'course/'+id+'/mp/'+id_pay,{
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+token
+            }
+        })
+        return await response.json()
+    }
 }

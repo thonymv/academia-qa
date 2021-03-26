@@ -1,14 +1,17 @@
 import React from 'react'
-import { FlatList, Dimensions, TouchableOpacity, TouchableHighlight, LayoutAnimation, Platform, UIManager, Modal, Image , ScrollView} from 'react-native'
+import { FlatList, Dimensions, TouchableOpacity, TouchableHighlight, LayoutAnimation, Platform, UIManager, Modal, Image, ScrollView, ActivityIndicator } from 'react-native'
 import { View, Spinner, Text, Card, Button, CardItem, Left, Right, Body, Thumbnail } from 'native-base'
 import Courses from '../../model/Courses'
 import ItemModule from '../../components/learn/itemModule'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
+import Icon3 from 'react-native-vector-icons/MaterialIcons';
 import { MIN_PASSED, SERVER } from '../../config/config'
 import ItemCourse from '../../components/learn/itemCourse'
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import MercadoPagoCheckout from '@blackbox-vision/react-native-mercadopago-px';
+import { WebView } from 'react-native-linkedin/node_modules/react-native-webview';
+import Storage from '../../model/Storage'
 
 if (
     Platform.OS === "android" &&
@@ -54,7 +57,7 @@ function ProgressBar({ width, height, percent, colorBar, colorProgress }) {
 
 /////MERCADO PAGO
 const MP_ACCESS_TOKEN = 'TEST-327743174144430-071520-f0276babdf909973e9dadc223501a3b4-408605535'
-const MP_PUBLIC_KEY='TEST-f602cc6b-2238-4839-9e20-f224caf00f20'
+const MP_PUBLIC_KEY = 'TEST-f602cc6b-2238-4839-9e20-f224caf00f20'
 /////////
 
 export default class Course extends React.Component {
@@ -64,15 +67,23 @@ export default class Course extends React.Component {
             course: null,
             activeIndex: null,
             modalBuy: false,
+            modalBuySuccess: false,
+            modalBuyFailed: false,
+            modalBuyPaypal: false,
+            loadBuyPaypal: false,
             paymentId: 0,
-            scroll:0 ,
-            MppaymentResult:null
+            scroll: 0,
+            MppaymentResult: null,
+            paymentLoad: false
         }
         this.payments = [
             require('../../../assets/general/paypal.png'),
             require('../../../assets/general/mercadopago.png')
         ]
         this.fontSize = Dimensions.get('window').width * 0.03
+        this.server = SERVER + 'api/course/' + this.props.route.params.id + "/pp"
+        this.width = Dimensions.get('window').width
+        this.height = Dimensions.get('window').height
         this.percentRadius = 8.5
         this.coursesModel = new Courses()
         this.coursesModel.find(this.props.route.params.id).then(course => {
@@ -81,45 +92,84 @@ export default class Course extends React.Component {
             this.setState({ course })
         })
         this.premium = false
+        this.getToken()
+    }
+
+    getToken = async ()=>{
+        this.token = await Storage.getToken()
     }
 
     getMercadoPagoPreferenceId = async (payer, ...items) => {
         const response = await fetch(
-          `https://api.mercadopago.com/checkout/preferences?access_token=${MP_ACCESS_TOKEN}`,
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              items,
-              payer: {
-                email: payer,
-              },
-            }),
-          }
+            `https://api.mercadopago.com/checkout/preferences?access_token=${MP_ACCESS_TOKEN}`,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    items,
+                    payer: {
+                        email: payer,
+                    },
+                }),
+            }
         );
         const preference = await response.json();
-  
-        return preference.id;
-      };
 
- async PayWithMercadoPago(){
+        return preference.id;
+    };
+
+    handleResponse = data => {
+        console.log(data.title)
+        console.log(this.props.route.params.id);
+        switch (data.title) {
+            case this.props.route.params.id+"":
+                let courseTmp = this.state.course
+                courseTmp.locked = false
+                this.setState({ modalBuyPaypal: false, modalBuySuccess: true , course:courseTmp})
+                console.log(data);
+                break;
+            case "failed":
+                this.setState({ modalBuyPaypal: false, modalBuyFailed: true })
+                console.log(data);
+                break;
+
+            default:
+                console.log(data);
+                break;
+        }
+    }
+
+    async PayWithMercadoPago() {
         try {
-           
+            this.setState({ paymentLoad: true, modalBuy: false })
             const preferenceId = await this.getMercadoPagoPreferenceId('payer@email.com', {
-              title: 'Dummy Item Title',
-              description: 'Dummy Item Description',
-              quantity: 1,
-              currency_id: 'ARS',
-              unit_price: 10.0,
+                title: this.state.course.name,
+                description: this.state.course.description,
+                quantity: 1,
+                currency_id: 'ARS',
+                unit_price: parseFloat(this.state.course.price),
             });
             const payment = await MercadoPagoCheckout.createPayment({
-              publicKey: MP_PUBLIC_KEY,
-              preferenceId,
+                publicKey: MP_PUBLIC_KEY,
+                preferenceId,
             });
-       
-            this.setState({MppaymentResult:payment})
-          } catch (err) {
-            Alert.alert('Something went wrong', err.message);
-          }
+            if (payment.id) {
+                let result = await this.coursesModel.payment(this.props.route.params.id, payment.id)
+                if (result.id_pay && result.id_pay == payment.id) {
+                    let courseTmp = this.state.course
+                    courseTmp.locked = false
+                    this.setState({ course: courseTmp })
+                    this.setState({ paymentLoad: false, modalBuySuccess: true })
+                } else {
+                    this.setState({ paymentLoad: false, modalBuyFailed: true })
+                }
+                console.log(result);
+            } else {
+                this.setState({ paymentLoad: false, modalBuyFailed: true })
+            }
+        } catch (err) {
+            console.log('error: ' + err.message);
+            this.setState({ paymentLoad: false, modalBuyFailed: true })
+        }
     }
 
     getHeight(width, sourceDir) {
@@ -153,6 +203,368 @@ export default class Course extends React.Component {
                 null
             }
         </TouchableOpacity>)
+    }
+    modalBuyPaypal = ({ visible, modal, onRequestClose, onLoad , onLoadStart}) => {
+        return (<Modal
+            visible={modal}
+            onRequestClose={onRequestClose}
+        >
+            <WebView source={{
+                uri: this.server,
+                headers: {
+                    Authorization: 'Bearer '+this.token,
+                }
+            }}
+                onLoad={onLoad}
+                onLoadStart={onLoadStart}
+                onNavigationStateChange={data => this.handleResponse(data)}
+            />
+            {visible && (
+                <View style={{ width: this.width, height: this.height, justifyContent: 'center', alignItems: 'center' }}>
+                    <Spinner color='blue' />
+                    <Text style={{ fontSize: Dimensions.get('window').width * 0.03 }}>Cargando...</Text>
+                </View>
+            )}
+        </Modal>)
+    }
+    modalBuySuccess = ({ visible, onRequestClose }) => {
+        var lessons = 0
+        var modules = 0
+        if (this.state.course && this.state.course.modules) {
+            this.state.course.modules.forEach(module => {
+                ++modules
+                module.lessons.forEach(lesson => {
+                    ++lessons
+                })
+            });
+        }
+        return (
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={visible}
+                onRequestClose={onRequestClose}
+            >
+                <TouchableOpacity
+                    onPress={onRequestClose}
+                    style={{
+                        width: Dimensions.get('window').width,
+                        height: Dimensions.get('window').height,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.35)'
+                    }}
+                >
+                    <TouchableHighlight >
+                        <View style={{
+                            borderRadius: Dimensions.get('window').width * 0.05,
+                        }}>
+                            <Card style={{
+                                width: Dimensions.get('window').width * 0.85,
+                                borderRadius: Dimensions.get('window').width * 0.05,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 3 },
+                                shadowOpacity: 0.29,
+                                shadowRadius: 4.65,
+                                elevation: 7
+                            }}>
+                                <CardItem bordered style={{
+                                    backgroundColor: '#404040',
+                                    borderTopLeftRadius: Dimensions.get('window').width * 0.05,
+                                    borderTopRightRadius: Dimensions.get('window').width * 0.05,
+                                }}>
+                                    <Body style={{
+                                        paddingVertical: Dimensions.get('window').height * 0.01
+                                    }}>
+                                        <Text style={{
+                                            color: 'white'
+                                        }}>
+                                            {this.state.course.name}
+                                        </Text>
+                                    </Body>
+                                    <Right>
+                                        <TouchableOpacity onPress={onRequestClose}>
+                                            <Icon2
+                                                name="close"
+                                                size={Dimensions.get('window').width * 0.05}
+                                                color="gray"
+                                            />
+                                        </TouchableOpacity>
+                                    </Right>
+                                </CardItem>
+                                <CardItem bordered style={{
+                                    borderBottomLeftRadius: this.state.course.locked ? 0 : Dimensions.get('window').width * 0.05,
+                                    borderBottomRightRadius: this.state.course.locked ? 0 : Dimensions.get('window').width * 0.05
+                                }}>
+                                    <Left>
+                                        <View style={{
+                                            alignItems: 'center',
+                                            padding: Dimensions.get('window').width * 0.025
+                                        }}>
+                                            <Thumbnail
+                                                source={{
+                                                    uri: SERVER + "img/" + this.state.course.image
+                                                }}
+                                                style={{ marginBottom: Dimensions.get('window').height * 0.01 }}
+                                            />
+                                            <Text style={{ textAlign: 'center', marginLeft: 0 }}>{this.state.course.name}</Text>
+                                            {this.state.course.locked ?
+                                                <Text note style={{
+                                                    textAlign: 'center',
+                                                    marginLeft: 0,
+                                                    fontSize: Dimensions.get('window').width * 0.0525
+                                                }}>
+                                                    {"US $" + this.state.course.price}
+                                                </Text>
+                                                :
+                                                <Text note style={{
+                                                    textAlign: 'center',
+                                                    marginLeft: 0,
+                                                    fontSize: Dimensions.get('window').width * 0.02
+                                                }}>
+                                                    DESBLOQUEADO
+                                                </Text>
+                                            }
+                                        </View>
+                                        <Body style={{}}>
+                                            <Text note style={{ textAlign: 'justify', fontSize: Dimensions.get('window').width * 0.0275 }}>{this.state.course.description}</Text>
+                                            <Text style={{
+                                                paddingTop: Dimensions.get('window').height * 0.005
+                                            }}>
+                                                <Text style={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    Módulos:
+                                                </Text>
+                                                <Text style={{
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    {" " + modules}
+                                                </Text>
+                                                <Text> / </Text>
+                                                <Text style={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    Lecciones:
+                                                </Text>
+                                                <Text style={{
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    {" " + lessons}
+                                                </Text>
+                                            </Text>
+                                        </Body>
+                                    </Left>
+                                </CardItem>
+                                <CardItem cardBody bordered style={{
+                                    borderBottomLeftRadius: Dimensions.get('window').width * 0.05,
+                                    borderBottomRightRadius: Dimensions.get('window').width * 0.05
+                                }}>
+                                    <View style={{
+                                        width: '100%',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <View style={{
+                                            paddingTop: Dimensions.get('window').height * 0.02
+                                        }}>
+                                            <Text style={{
+                                                fontWeight: 'bold',
+                                                color: '#0ec842',
+                                                fontSize: Dimensions.get('window').width * 0.05
+                                            }}>
+                                                Felicidades por su compra!
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            paddingVertical: Dimensions.get('window').height * 0.02
+                                        }}>
+                                            <Icon2
+                                                name="check-circle"
+                                                size={Dimensions.get('window').width * 0.2}
+                                                color="#0ec842"
+                                            />
+                                        </View>
+                                    </View>
+                                </CardItem>
+                            </Card>
+                        </View>
+                    </TouchableHighlight>
+                </TouchableOpacity>
+            </Modal>
+        )
+    }
+
+    modalBuyFailed = ({ visible, onRequestClose }) => {
+        var lessons = 0
+        var modules = 0
+        if (this.state.course && this.state.course.modules) {
+            this.state.course.modules.forEach(module => {
+                ++modules
+                module.lessons.forEach(lesson => {
+                    ++lessons
+                })
+            });
+        }
+        return (
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={visible}
+                onRequestClose={onRequestClose}
+            >
+                <TouchableOpacity
+                    onPress={onRequestClose}
+                    style={{
+                        width: Dimensions.get('window').width,
+                        height: Dimensions.get('window').height,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(0, 0, 0, 0.35)'
+                    }}
+                >
+                    <TouchableHighlight >
+                        <View style={{
+                            borderRadius: Dimensions.get('window').width * 0.05,
+                        }}>
+                            <Card style={{
+                                width: Dimensions.get('window').width * 0.85,
+                                borderRadius: Dimensions.get('window').width * 0.05,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 3 },
+                                shadowOpacity: 0.29,
+                                shadowRadius: 4.65,
+                                elevation: 7
+                            }}>
+                                <CardItem bordered style={{
+                                    backgroundColor: '#404040',
+                                    borderTopLeftRadius: Dimensions.get('window').width * 0.05,
+                                    borderTopRightRadius: Dimensions.get('window').width * 0.05,
+                                }}>
+                                    <Body style={{
+                                        paddingVertical: Dimensions.get('window').height * 0.01
+                                    }}>
+                                        <Text style={{
+                                            color: 'white'
+                                        }}>
+                                            {this.state.course.name}
+                                        </Text>
+                                    </Body>
+                                    <Right>
+                                        <TouchableOpacity onPress={onRequestClose}>
+                                            <Icon2
+                                                name="close"
+                                                size={Dimensions.get('window').width * 0.05}
+                                                color="gray"
+                                            />
+                                        </TouchableOpacity>
+                                    </Right>
+                                </CardItem>
+                                <CardItem bordered style={{
+                                    borderBottomLeftRadius: this.state.course.locked ? 0 : Dimensions.get('window').width * 0.05,
+                                    borderBottomRightRadius: this.state.course.locked ? 0 : Dimensions.get('window').width * 0.05
+                                }}>
+                                    <Left>
+                                        <View style={{
+                                            alignItems: 'center',
+                                            padding: Dimensions.get('window').width * 0.025
+                                        }}>
+                                            <Thumbnail
+                                                source={{
+                                                    uri: SERVER + "img/" + this.state.course.image
+                                                }}
+                                                style={{ marginBottom: Dimensions.get('window').height * 0.01 }}
+                                            />
+                                            <Text style={{ textAlign: 'center', marginLeft: 0 }}>{this.state.course.name}</Text>
+                                            {this.state.course.locked ?
+                                                <Text note style={{
+                                                    textAlign: 'center',
+                                                    marginLeft: 0,
+                                                    fontSize: Dimensions.get('window').width * 0.0525
+                                                }}>
+                                                    {"US $" + this.state.course.price}
+                                                </Text>
+                                                :
+                                                <Text note style={{
+                                                    textAlign: 'center',
+                                                    marginLeft: 0,
+                                                    fontSize: Dimensions.get('window').width * 0.02
+                                                }}>
+                                                    DESBLOQUEADO
+                                                </Text>
+                                            }
+                                        </View>
+                                        <Body style={{}}>
+                                            <Text note style={{ textAlign: 'justify', fontSize: Dimensions.get('window').width * 0.0275 }}>{this.state.course.description}</Text>
+                                            <Text style={{
+                                                paddingTop: Dimensions.get('window').height * 0.005
+                                            }}>
+                                                <Text style={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    Módulos:
+                                                </Text>
+                                                <Text style={{
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    {" " + modules}
+                                                </Text>
+                                                <Text> / </Text>
+                                                <Text style={{
+                                                    fontWeight: 'bold',
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    Lecciones:
+                                                </Text>
+                                                <Text style={{
+                                                    fontSize: Dimensions.get('window').width * 0.03
+                                                }}>
+                                                    {" " + lessons}
+                                                </Text>
+                                            </Text>
+                                        </Body>
+                                    </Left>
+                                </CardItem>
+                                <CardItem cardBody bordered style={{
+                                    borderBottomLeftRadius: Dimensions.get('window').width * 0.05,
+                                    borderBottomRightRadius: Dimensions.get('window').width * 0.05
+                                }}>
+                                    <View style={{
+                                        width: '100%',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <View style={{
+                                            paddingTop: Dimensions.get('window').height * 0.02
+                                        }}>
+                                            <Text style={{
+                                                fontWeight: 'bold',
+                                                color: '#d50000',
+                                                fontSize: Dimensions.get('window').width * 0.05
+                                            }}>
+                                                Oh no, su pago ha fallado.
+                                            </Text>
+                                        </View>
+                                        <View style={{
+                                            paddingVertical: Dimensions.get('window').height * 0.02
+                                        }}>
+                                            <Icon3
+                                                name="error"
+                                                size={Dimensions.get('window').width * 0.2}
+                                                color="#d50000"
+                                            />
+                                        </View>
+                                    </View>
+                                </CardItem>
+                            </Card>
+                        </View>
+                    </TouchableHighlight>
+                </TouchableOpacity>
+            </Modal>
+        )
     }
 
     modalBuy = ({ visible, onRequestClose }) => {
@@ -360,8 +772,16 @@ export default class Course extends React.Component {
                                                         backgroundColor: '#404040'
                                                     }}
                                                     onPress={() => {
-                                                       // this.setState({ modalBuy: false })
-                                                        this.PayWithMercadoPago()
+                                                        switch (this.state.paymentId) {
+                                                            case 0:
+                                                                this.setState({ modalBuyPaypal: true, loadBuyPaypal: true, modalBuy: false })
+                                                                break;
+                                                            case 1:
+                                                                this.PayWithMercadoPago()
+                                                                break;
+                                                            default:
+                                                                break;
+                                                        }
                                                     }}
                                                 >
                                                     <Text>Comprar</Text>
@@ -395,7 +815,7 @@ export default class Course extends React.Component {
         )
     }
 
-    lesson = ({ lesson, marginLeft, unlocked, last , index, index_module}) => {
+    lesson = ({ lesson, marginLeft, unlocked, last, index, index_module }) => {
         var sizePoint = Dimensions.get('window').width * 0.035
         return (
             <View style={{
@@ -427,13 +847,13 @@ export default class Course extends React.Component {
                         flexDirection: 'row'
                     }}>
                         <View>
-                            <Text style={{ color: "gray" , fontSize:Dimensions.get('window').width*0.035, fontWeight:'bold'}}>
-                                Lección {index_module+1}.{index+1}
+                            <Text style={{ color: "gray", fontSize: Dimensions.get('window').width * 0.035, fontWeight: 'bold' }}>
+                                Lección {index_module + 1}.{index + 1}
                             </Text>
-                            <Text style={{ 
-                                color: "#acacac", 
-                                marginTop:Dimensions.get('window').height*0.08,
-                                fontSize:Dimensions.get('window').width*0.035
+                            <Text style={{
+                                color: "#acacac",
+                                marginTop: Dimensions.get('window').height * 0.08,
+                                fontSize: Dimensions.get('window').width * 0.035
                             }}>
                                 {lesson.name}
                             </Text>
@@ -441,12 +861,12 @@ export default class Course extends React.Component {
                         <View style={{
                             flex: 1,
                             alignItems: 'flex-end',
-                            justifyContent:'flex-end'
+                            justifyContent: 'flex-end'
                         }}>
                             {!unlocked ?
                                 <Icon name="lock" size={25} color="#d5d5d5" />
                                 :
-                                lesson.percent >= MIN_PASSED?
+                                lesson.percent >= MIN_PASSED ?
                                     <Icon2 name="check-circle" size={25} color="#0ec842" />
                                     :
                                     <Icon2 name="play-circle" size={25} color="gray" />
@@ -484,14 +904,14 @@ export default class Course extends React.Component {
         var marginLeft = Dimensions.get('window').width * 0.05
         var index_module = index
         return (
-            <View style={{ width: '100%' , paddingTop:index==0?Dimensions.get('window').height*0.01:0 }}>
+            <View style={{ width: '100%', paddingTop: index == 0 ? Dimensions.get('window').height * 0.01 : 0 }}>
                 <View style={{
                     marginLeft,
                     width: '100%',
                     paddingVertical: Dimensions.get('window').width * 0.01,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    flex:1
+                    flex: 1
                 }}>
                     <ItemModule
                         percent={percent}
@@ -530,8 +950,8 @@ export default class Course extends React.Component {
                             data={module.lessons}
                             renderItem={({ item, index }) => {
                                 return this.lesson({
-                                    index:index,
-                                    index_module:index_module,
+                                    index: index,
+                                    index_module: index_module,
                                     lesson: item,
                                     marginLeft: marginLeft + radius,
                                     unlocked: (unlocked && (index == 0)) || (index != 0 && module.lessons[index - 1].percent >= MIN_PASSED),
@@ -554,7 +974,7 @@ export default class Course extends React.Component {
     }
 
     render() {
-        if (!this.state.course) {
+        if (!this.state.course || this.state.paymentLoad) {
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <Spinner color='blue' />
@@ -594,10 +1014,34 @@ export default class Course extends React.Component {
         }
 
         var ModalBuy = this.modalBuy
+        var ModalBuySuccess = this.modalBuySuccess
+        var ModalBuyFailed = this.modalBuyFailed
+        var ModalBuyPaypal = this.modalBuyPaypal
         return (
             <View style={{
-                flex:1
+                flex: 1
             }}>
+                <ModalBuySuccess
+                    visible={this.state.modalBuySuccess}
+                    onRequestClose={() => this.setState({ modalBuySuccess: false })}
+                />
+                <ModalBuyPaypal
+                    visible={this.state.loadBuyPaypal}
+                    modal={this.state.modalBuyPaypal}
+                    onRequestClose={() => {
+                        this.setState({ modalBuyPaypal: false })
+                    }}
+                    onLoad={() => {
+                        this.setState({ loadBuyPaypal: false })
+                    }}
+                    onLoadStart={()=>{
+                        this.setState({ loadBuyPaypal: true })
+                    }}
+                />
+                <ModalBuyFailed
+                    visible={this.state.modalBuyFailed}
+                    onRequestClose={() => this.setState({ modalBuyFailed: false })}
+                />
                 <ModalBuy
                     visible={this.state.modalBuy}
                     onRequestClose={() => this.setState({ modalBuy: false })}
@@ -757,9 +1201,9 @@ export default class Course extends React.Component {
                         })
                     }}
                     keyExtractor={item => item.id}
-                    onScroll={({nativeEvent})=>{
+                    onScroll={({ nativeEvent }) => {
                         if (nativeEvent.contentOffset.y <= 100) {
-                            
+
                         }
                     }}
                 />
