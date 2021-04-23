@@ -1,3 +1,5 @@
+import node_lesson from "./node_lesson";
+
 export default class Lesson {
 
     constructor(
@@ -8,7 +10,10 @@ export default class Lesson {
         public test?: string,
         public status?: boolean,
         public percent?: boolean,
+        public nodes?: Array<node_lesson>,
         public updated_at?:Date
-    ){}
+    ){
+
+    }
 
 }

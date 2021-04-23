@@ -6,6 +6,7 @@ import Section from './section'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Icon } from 'native-base';
 import Course from './course';
+import Lesson from './lesson';
 
 const Stack = createStackNavigator();
 
@@ -50,6 +51,24 @@ export default function Learn({navigation}) {
             <Stack.Screen
                 name="course"
                 component={Course}
+                options={({ route, navigation }) => ({
+                    title: route.params.name,
+                    headerLeft: () => (
+                        <TouchableOpacity style={{ paddingLeft: 10 }} onPress={() => {
+                            navigation.goBack()
+                        }}>
+                            <Icon name={"arrowleft"} size={16} style={{ color: 'white' }} type={'AntDesign'} />
+                        </TouchableOpacity>
+                    ),
+                    headerTitleStyle: {
+                        fontWeight: 'normal',
+                        fontSize: Dimensions.get('window').width * 0.035
+                    }
+                })}
+            />
+            <Stack.Screen
+                name="lesson"
+                component={Lesson}
                 options={({ route, navigation }) => ({
                     title: route.params.name,
                     headerLeft: () => (

@@ -836,16 +836,24 @@ export default class Course extends React.Component {
                         }} />
                         <Line marginLeft={marginLeft} hide={last} />
                     </View>
-                    <TouchableOpacity style={{
-                        marginVertical: Dimensions.get('window').height * 0.01,
-                        marginLeft: Dimensions.get('window').width * 0.05,
-                        backgroundColor: 'white',
-                        width: Dimensions.get('window').width * 0.75,
-                        paddingHorizontal: Dimensions.get('window').width * 0.04,
-                        paddingVertical: Dimensions.get('window').height * 0.025,
-                        borderRadius: Dimensions.get('window').width * 0.025,
-                        flexDirection: 'row'
-                    }}>
+                    <TouchableOpacity 
+                        onPress={()=>{
+                            this.props.navigation.navigate('lesson', {
+                                name: lesson.name,
+                                id: lesson.id
+                            });
+                        }}
+                        style={{
+                            marginVertical: Dimensions.get('window').height * 0.01,
+                            marginLeft: Dimensions.get('window').width * 0.05,
+                            backgroundColor: 'white',
+                            width: Dimensions.get('window').width * 0.75,
+                            paddingHorizontal: Dimensions.get('window').width * 0.04,
+                            paddingVertical: Dimensions.get('window').height * 0.025,
+                            borderRadius: Dimensions.get('window').width * 0.025,
+                            flexDirection: 'row'
+                        }}
+                    >
                         <View>
                             <Text style={{ color: "gray", fontSize: Dimensions.get('window').width * 0.035, fontWeight: 'bold' }}>
                                 Lección {index_module + 1}.{index + 1}
